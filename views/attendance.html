@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Asistencia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .success {
+            color: #28a745;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            background: #4facfe;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 15px;
+        }
+        button:hover {
+            background: #3d8bfe;
+        }
+        .info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4facfe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Registro de Asistencia</h1>
+        
+        <div id="registrationForm">
+            <div class="info">
+                <p>Por favor ingresa tus datos para registrar tu asistencia</p>
+            </div>
+            
+            <input type="text" id="studentName" placeholder="Tu nombre completo" required>
+            <input type="email" id="studentEmail" placeholder="Tu email" required>
+            <button onclick="registerAttendance()">Registrar Asistencia</button>
+        </div>
+
+        <div id="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        const type = urlParams.get('type') || 'qr';
+
+        if (!sessionId) {
+            document.getElementById('result').innerHTML = '<div class="error">❌ Enlace inválido</div>';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('registrationForm').style.display = 'none';
+        }
+
+        function registerAttendance() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('studentEmail').value.trim();
+
+            if (!name || !email) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            // Validar email básico
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Por favor ingresa un email válido');
+                return;
+            }
+
+            // Registrar asistencia
+            const attendanceData = {
+                sessionId: sessionId,
+                studentName: name,
+                studentEmail: email,
+                timestamp: new Date().toISOString(),
+                type: type
+            };
+
+            // Guardar en localStorage (simula base de datos)
+            let attendanceRecords = JSON.parse(localStorage.getItem('realAttendanceRecords')) || [];
+            
+            // Verificar si ya se registró
+            const alreadyRegistered = attendanceRecords.find(record => 
+                record.sessionId === sessionId && record.studentEmail === email
+            );
+
+            if (alreadyRegistered) {
+                document.getElementById('result').innerHTML = 
+                    '<div class="error">⚠️ Ya te has registrado para esta clase</div>';
+            } else {
+                attendanceRecords.push(attendanceData);
+                localStorage.setItem('realAttendanceRecords', JSON.stringify(attendanceRecords));
+                
+                document.getElementById('result').innerHTML = 
+                    `<div class="success">✅ ¡Asistencia registrada correctamente!</div>
+                     <p>Nombre: ${name}</p>
+                     <p>Email: ${email}</p>
+                     <p>Hora: ${new Date().toLocaleTimeString()}</p>`;
+            }
+
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('registrationForm').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

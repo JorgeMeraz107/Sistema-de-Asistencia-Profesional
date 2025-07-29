@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 Sistema de Asistencia Profesional</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header fijo -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>📋 Sistema de Asistencia</h1>
+                <div class="header-actions">
+                    <button onclick="showSection('dashboard')" class="nav-btn" id="dashboardBtn">🏠 Inicio</button>
+                    <button onclick="showSection('newAttendance')" class="nav-btn" id="newBtn">➕ Nueva</button>
+                    <button onclick="showSection('history')" class="nav-btn" id="historyBtn">📚 Historial</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Contenido principal con scroll -->
+        <main class="app-main">
+            <div id="message" class="message-container"></div>
+
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="section active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-icon">📊</div>
+                        <h3>Asistencias Totales</h3>
+                        <div class="card-number" id="totalAttendances">0</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">📚</div>
+                        <h3>Materias Activas</h3>
+                        <div class="card-number" id="activeSubjects">0</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="card-icon">👥</div>
+                        <h3>Estudiantes Registrados</h3>
+                        <div class="card-number" id="totalStudents">0</div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <h2>📋 Asistencias Recientes</h2>
+                    <div id="recentAttendances" class="recent-list"></div>
+                </div>
+
+                <div class="quick-actions">
+                    <button onclick="showSection('newAttendance')" class="primary-btn large-btn">
+                        ➕ Nueva Asistencia
+                    </button>
+                </div>
+            </section>
+
+            <!-- NUEVA ASISTENCIA -->
+            <section id="newAttendance" class="section">
+                <div class="section-header">
+                    <h2>➕ Nueva Asistencia</h2>
+                    <button onclick="showSection('dashboard')" class="back-btn">← Volver</button>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-section">
+                        <h3>📚 Información de la Clase</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Materia:</label>
+                                <select id="subjectSelect" onchange="handleSubjectChange()">
+                                    <option value="">Selecciona una materia</option>
+                                    <option value="Desarrollo Web">Desarrollo Web - 3° Bachiller Informática</option>
+                                    <option value="Redes">Redes - 3° Informática</option>
+                                    <option value="Taller de Diseño">Taller de Diseño - 3° Diseño Gráfico</option>
+                                    <option value="Ofimática">Ofimática - 3° Diseño Gráfico</option>
+                                    <option value="3D">3D - 3° Diseño Gráfico</option>
+                                    <option value="custom">✏️ Otra materia</option>
+                                </select>
+                                <input type="text" id="customSubject" placeholder="Escribe tu materia" class="hidden">
+                            </div>
+                            <div class="form-group">
+                                <label>Profesor/a:</label>
+                                <input type="text" id="teacherName" placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Grupo/Sección:</label>
+                                <input type="text" id="className" placeholder="ej: 3°A, Sección 1">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha:</label>
+                                <input type="date" id="classDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👥 Estudiantes</h3>
+                        <div class="students-input">
+                            <div class="input-tabs">
+                                <button class="tab-btn active" onclick="showInputTab('paste')">📋 Pegar Lista</button>
+                                <button class="tab-btn" onclick="showInputTab('individual')">➕ Individual</button>
+                                <button class="tab-btn" onclick="showInputTab('previous')">📚 Usar Anterior</button>
+                            </div>
+
+                            <div id="pasteTab" class="input-tab active">
+                                <textarea id="studentsList" rows="6" placeholder="Pega aquí tu lista de estudiantes (uno por línea):
+
+Juan Pérez
+María García  
+Carlos López
+Ana Martínez"></textarea>
+                                <button onclick="importStudents()" class="secondary-btn">📥 Importar Lista</button>
+                            </div>
+
+                            <div id="individualTab" class="input-tab">
+                                <div class="add-student-form">
+                                    <input type="text" id="studentName" placeholder="Nombre del estudiante">
+                                    <button onclick="addStudent()" class="secondary-btn">➕ Agregar</button>
+                                </div>
+                            </div>
+
+                            <div id="previousTab" class="input-tab">
+                                <select id="previousSubjectSelect" onchange="loadPreviousStudents()">
+                                    <option value="">Selecciona materia anterior</option>
+                                </select>
+                                <button onclick="usePreviousStudents()" class="secondary-btn">📚 Usar Estudiantes</button>
+                            </div>
+                        </div>
+
+                        <div id="currentStudents" class="students-preview"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button onclick="startAttendance()" id="startAttendanceBtn" class="primary-btn large-btn" disabled>
+                            🚀 Comenzar Asistencia
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PASAR ASISTENCIA -->
+            <section id="attendance" class="section">
+                <div class="section-header">
+                    <div class="attendance-info" id="attendanceInfo"></div>
+                    <button onclick="showSection('newAttendance')" class="back-btn">← Volver</button>
+                </div>
+
+                <div class="attendance-stats" id="attendanceStats"></div>
+
+                <div class="attendance-controls">
+                    <button onclick="markAllPresent()" class="bulk-btn present-bulk">✅ Todos Presentes</button>
+                    <button onclick="markAllAbsent()" class="bulk-btn absent-bulk">❌ Todos Ausentes</button>
+                    <button onclick="resetCurrentAttendance()" class="bulk-btn reset-bulk">🔄 Reiniciar</button>
+                </div>
+
+                <div class="students-container">
+                    <div id="attendanceList" class="students-grid"></div>
+                </div>
+
+                <div class="attendance-actions">
+                    <button onclick="saveAttendance()" class="primary-btn large-btn">💾 Guardar Asistencia</button>
+                </div>
+            </section>
+
+            <!-- HISTORIAL -->
+            <section id="history" class="section">
+                <div class="section-header">
+                    <h2>📚 Historial de Asistencias</h2>
+                    <button onclick="showSection('dashboard')" class="back-btn">← Volver</button>
+                </div>
+
+                <div class="history-filters">
+                    <select id="historySubjectFilter" onchange="filterHistory()">
+                        <option value="">Todas las materias</option>
+                    </select>
+                    <input type="month" id="historyMonthFilter" onchange="filterHistory()">
+                </div>
+
+                <div id="historyList" class="history-container"></div>
+            </section>
+        </main>
+
+        <!-- Modal de resultados -->
+        <div id="resultsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📊 Asistencia Guardada</h3>
+                    <button onclick="closeModal()" class="close-btn">×</button>
+                </div>
+                <div id="modalResults" class="modal-body"></div>
+                <div class="modal-actions">
+                    <button onclick="exportWord()" class="secondary-btn">📄 Word</button>
+                    <button onclick="exportExcel()" class="secondary-btn">📊 Excel</button>
+                    <button onclick="newAttendanceFromModal()" class="primary-btn">➕ Nueva Asistencia</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
