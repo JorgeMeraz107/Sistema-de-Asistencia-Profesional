@@ -11,7 +11,9 @@ con la informacion de la lista que se acaba de pasar
 <img width="1407" height="950" alt="image" src="https://github.com/user-attachments/assets/9281b70c-f788-44b4-8c14-0932badfc2fb" />
 
 
+
 <img width="1352" height="949" alt="image" src="https://github.com/user-attachments/assets/7573b563-ec04-4040-8b9a-5c5e7711e430" />
+
 
 
 
